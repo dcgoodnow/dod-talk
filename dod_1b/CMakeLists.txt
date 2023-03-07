@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-project(dod_1 VERSION 1.0)
+project(dod_1a VERSION 1.0)
 
 FetchContent_Declare(googletest
    GIT_REPOSITORY https://github.com/google/googletest.git
@@ -22,7 +22,7 @@ set(sources
    main.cpp
 )
 
-add_executable(dod_1 ${sources})
+add_executable(${PROJECT_NAME} ${sources})
 
 target_link_libraries(${PROJECT_NAME} ${LIBS})
 

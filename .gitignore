@@ -6,3 +6,4 @@ cachegrind.*
 lib/
 bin/
 _deps/
+build/
