@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <string>
 
-const int ITERATIONS = 1000000;
+const int ITERATIONS = 1'000'000;
 
 static std::array<int, ITERATIONS> intArray;
 class ArrayFixture : public benchmark::Fixture
