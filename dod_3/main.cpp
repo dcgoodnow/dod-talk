@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <vector>
 
-const int CARS = 100000;
+const int CARS = 2 << 19;
 
 struct vector3 {
    float x;
@@ -81,7 +81,7 @@ class OOFixture : public benchmark::Fixture
 public:
    void SetUp(const ::benchmark::State& state)
    {
-      for(int i = 0; i < CARS; i++) {
+      for(int i = 0; i < state.range(0); i++) {
          Car car(vector3(rand() % 1, rand() % 1, rand() % 1), rand() % 10, "ACME", "SuperCar", {255, 255, 255});
          ooCars.push_back(car);
       }
@@ -97,7 +97,7 @@ class DOFixture : public benchmark::Fixture
 public:
    void SetUp(const ::benchmark::State& state)
    {
-      for(int i = 0; i < CARS; i++) {
+      for(int i = 0; i < state.range(0); i++) {
          doCars.Positions.push_back(vector3(0,0,0));
          doCars.Directions.push_back(vector3(rand() % 1, rand() % 1, rand() % 1));
          doCars.Speeds.push_back(rand() % 10);
@@ -111,7 +111,7 @@ public:
    }
 };
 
-BENCHMARK_F(OOFixture, OOCarsTest)(benchmark::State& st)
+BENCHMARK_DEFINE_F(OOFixture, OOCarsTest)(benchmark::State& st)
 {
    for(auto _ : st) {
       benchmark::ClobberMemory();
@@ -123,16 +123,19 @@ BENCHMARK_F(OOFixture, OOCarsTest)(benchmark::State& st)
 }
 
 
-BENCHMARK_F(DOFixture, DOCarsTest)(benchmark::State& st)
+BENCHMARK_DEFINE_F(DOFixture, DOCarsTest)(benchmark::State& st)
 {
    for(auto _ : st) {
       benchmark::ClobberMemory();
-      for(int i = 0; i < CARS; i++)
+      for(int i = 0; i < st.range(0); i++)
       {
          benchmark::DoNotOptimize(doCars.Positions[i] += doCars.Directions[i] * doCars.Speeds[i]);
       }
    }
 }
+
+BENCHMARK_REGISTER_F(OOFixture, OOCarsTest)->RangeMultiplier(2)->Range(2<<10, 2<<19);
+BENCHMARK_REGISTER_F(DOFixture, DOCarsTest)->RangeMultiplier(2)->Range(2<<10, 2<<19);
 
 BENCHMARK_MAIN();
 

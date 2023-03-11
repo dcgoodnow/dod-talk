@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <string>
 
-const int ITERATIONS = 1'000'000;
+const int ITERATIONS = 2 << 20;
 
 static std::array<int, ITERATIONS> intArray;
 class ArrayFixture : public benchmark::Fixture
@@ -51,26 +51,30 @@ public:
    }
 };
 
-BENCHMARK_F(ArrayFixture, ArrayTest)(benchmark::State& st)
+BENCHMARK_DEFINE_F(ArrayFixture, ArrayTest)(benchmark::State& st)
 {
    for(auto _ : st) {
       benchmark::ClobberMemory();
-      for(int i = 0; i < intArray.size(); i++) {
+      for(int i = 0; i < st.range(0); i++) {
          benchmark::DoNotOptimize(intArray[i] *= intArray[i]);
       }
    }
 }
+BENCHMARK_REGISTER_F(ArrayFixture, ArrayTest)->RangeMultiplier(2)->Range(2<<10, 2<<20);
 
-BENCHMARK_F(ObjectFixture, ObjectTest)(benchmark::State& st)
+BENCHMARK_DEFINE_F(ObjectFixture, ObjectTest)(benchmark::State& st)
 {
    for(auto _ : st) {
       benchmark::ClobberMemory();
-      for(int i = 0; i < ITERATIONS; i++)
+      for(int i = 0; i < st.range(0); i++)
       {
          benchmark::DoNotOptimize(namedIntArray[i].Value *= namedIntArray[i].Value);
       }
    }
 }
+
+BENCHMARK_REGISTER_F(ObjectFixture, ObjectTest)->RangeMultiplier(2)->Range(2<<10, 2<<20);
+
 
 BENCHMARK_MAIN();
 
